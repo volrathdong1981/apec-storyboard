@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Mangrove Promise - 分镜故事板</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; 
+    background: #0a0f1a; color: #e0e6ed; line-height: 1.6;
+  }
+
+  /* Header */
+  .header {
+    text-align: center; padding: 60px 20px 40px;
+    background: linear-gradient(180deg, #0d1b2a 0%, #1b2838 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .header h1 { 
+    font-size: 2.4em; font-weight: 300; letter-spacing: 0.1em;
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .header .subtitle { color: #8899aa; font-size: 1.1em; margin-top: 8px; }
+  
+  /* Stats Bar */
+  .stats-bar {
+    display: flex; justify-content: center; gap: 40px; padding: 25px 20px;
+    background: #111827; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .stat-item { text-align: center; }
+  .stat-value { font-size: 1.8em; font-weight: 700; color: #fda085; }
+  .stat-label { font-size: 0.85em; color: #6b7b8d; margin-top: 2px; }
+
+  /* Timeline */
+  .timeline {
+    max-width: 1000px; margin: 0 auto; padding: 40px 20px 80px;
+    position: relative;
+  }
+  .timeline::before {
+    content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(180deg, #fda08500, #fda085, #f6d365, #fda08500);
+    transform: translateX(-50%);
+  }
+
+  /* Scene Card */
+  .scene {
+    position: relative; margin-bottom: 50px;
+    display: flex; align-items: flex-start;
+  }
+  .scene:nth-child(odd) { flex-direction: row; }
+  .scene:nth-child(even) { flex-direction: row-reverse; }
+
+  .scene-dot {
+    position: absolute; left: 50%; top: 30px; transform: translateX(-50%);
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fda085; border: 3px solid #0a0f1a; z-index: 2;
+    box-shadow: 0 0 15px rgba(253,160,133,0.4);
+  }
+
+  .scene-card {
+    width: 44%; padding: 28px; border-radius: 16px;
+    background: linear-gradient(145deg, #1a2332, #151d2b);
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .scene-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.4);
+  }
+  .scene:nth-child(odd) .scene-card { margin-right: auto; }
+  .scene:nth-child(even) .scene-card { margin-left: auto; }
+
+  .scene-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .scene-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 36px; border-radius: 10px; padding: 0 10px;
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    color: #0a0f1a; font-weight: 700; font-size: 0.85em;
+  }
+  .scene-title { font-size: 1.15em; font-weight: 600; color: #f0f4f8; }
+  .scene-time {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    background: rgba(253,160,133,0.12); color: #fda085;
+    font-size: 0.8em; font-weight: 500; margin-left: auto;
+  }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex; gap: 0; margin: 16px 0 12px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .tab-btn {
+    padding: 8px 16px; background: none; border: none; color: #6b7b8d;
+    font-size: 0.85em; cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-btn.active { color: #fda085; border-bottom-color: #fda085; }
+  .tab-btn:hover { color: #c0cad5; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* English Script */
+  .en-script {
+    font-size: 1.05em; line-height: 1.8; color: #e8edf2;
+    padding: 16px; border-radius: 10px;
+    background: rgba(246,211,101,0.04);
+    border-left: 3px solid #f6d365;
+    font-style: italic;
+  }
+
+  /* Chinese Translation */
+  .cn-script {
+    font-size: 0.95em; line-height: 1.8; color: #a0aab5;
+    padding: 16px; border-radius: 10px;
+    background: rgba(255,255,255,0.02);
+    border-left: 3px solid #4a6785;
+  }
+
+  /* Visual Desc */
+  .visual-desc {
+    padding: 12px 16px; border-radius: 10px;
+    background: rgba(100,200,150,0.05);
+    border-left: 3px solid #4ade80;
+  }
+  .visual-item {
+    margin-bottom: 10px; font-size: 0.9em; color: #a0b5a8;
+  }
+  .visual-item:last-child { margin-bottom: 0; }
+  .visual-item strong { color: #4ade80; }
+
+  /* Voice Tip */
+  .voice-tip {
+    margin-top: 14px; padding: 10px 14px; border-radius: 8px;
+    background: rgba(253,160,133,0.06);
+    font-size: 0.85em; color: #c0a090;
+  }
+  .voice-tip::before { content: '🎙 '; }
+
+  /* Word Count Badge */
+  .word-count {
+    display: inline-block; padding: 2px 8px; border-radius: 12px;
+    background: rgba(253,160,133,0.15); color: #fda085;
+    font-size: 0.75em; font-weight: 600; margin-left: 8px;
+  }
+
+  /* Title/End card style */
+  .scene-card.title-card {
+    background: linear-gradient(145deg, #1a2332, #151d2b);
+    border: 1px dashed rgba(246,211,101,0.2);
+    text-align: center; padding: 20px;
+  }
+  .title-card .card-text { color: #8899aa; font-size: 0.95em; }
+
+  /* Compare Section */
+  .compare-section {
+    max-width: 900px; margin: 0 auto 60px; padding: 0 20px;
+  }
+  .compare-title {
+    text-align: center; font-size: 1.5em; font-weight: 300; color: #8899aa;
+    margin-bottom: 30px; letter-spacing: 0.05em;
+  }
+  .compare-table { width: 100%; border-collapse: collapse; }
+  .compare-table th {
+    padding: 14px 16px; text-align: left; font-size: 0.85em; font-weight: 600;
+    color: #fda085; border-bottom: 2px solid rgba(253,160,133,0.2);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .compare-table td {
+    padding: 14px 16px; font-size: 0.9em; color: #a0aab5;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+  }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .old-text { color: #e06060; text-decoration: line-through; opacity: 0.7; }
+  .new-text { color: #4ade80; }
+
+  @media (max-width: 768px) {
+    .timeline::before { left: 20px; }
+    .scene { flex-direction: column !important; }
+    .scene-dot { left: 20px; }
+    .scene-card { width: 100% !important; margin-left: 50px !important; margin-right: 0 !important; }
+    .stats-bar { flex-wrap: wrap; gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>THE MANGROVE PROMISE</h1>
+  <div class="subtitle">《红树林的约定》 — 优化版分镜故事板 v1</div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-value">2:20</div>
+    <div class="stat-label">总时长</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">~230</div>
+    <div class="stat-label">英文总词数</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">7</div>
+    <div class="stat-label">镜头段落</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">14</div>
+    <div class="stat-label">画面素材</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">~105</div>
+    <div class="stat-label">词/分钟语速</div>
+  </div>
+</div>
+
+<div class="timeline">
+
+  <!-- 片头 -->
+  <div class="scene">
+    <div class="scene-dot"></div>
+    <div class="scene-card title-card">
+      <div class="scene-header">
+        <span class="scene-num">片头</span>
+        <span class="scene-title">TITLE CARD</span>
+        <span class="scene-time">0:00 - 0:05</span>
+      </div>
+      <div class="card-text">
+        黑屏渐入 → 标题 <strong style="color:#f6d365">"The Mangrove Promise"</strong><br>
+        副标题 "A Story from Shenzhen" · 纯音乐
+      </div>
+    </div>
+  </div>
+
+  <!-- 第1幕 -->
+  <div class="scene" id="scene1">
+    <div class="scene-dot"></div>
+    <div class="scene-card">
+      <div class="scene-header">
+        <span class="scene-num">第1幕</span>
+        <span class="scene-title">钩子 + 开场</span>
+        <span class="word-count">45词</span>
+        <span class="scene-time">0:05 - 0:25</span>
+      </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this, 'en')">English Script</button>
+        <button class="tab-btn" onclick="switchTab(this, 'cn')">中文对照</button>
+        <button class="tab-btn" onclick="switchTab(this, 'vis')">画面描述</button>
+      </div>
+      <div class="tab-content active" data-tab="en">
+        <div class="en-script">
+          Every year, thousands of birds fly across the ocean to visit my city. They don't need a passport. They don't know borders. But they connect people from all across the Asia-Pacific.<br><br>
+          My name is [名字], and I'm a Grade 5 student from Shenzhen. This is their story — and mine.
+        </div>
+      </div>
+      <div class="tab-content" data-tab="cn">
+        <div class="cn-script">
+          每年，成千上万的鸟儿飞越大海来到我的城市。它们不需要护照，也不懂国界。但它们却把亚太地区的人们连在了一起。<br><br>
+          我叫[名字]，是一名来自深圳的五年级学生。这是它们的故事——也是我的。
+        </div>
+      </div>
+      <div class="tab-content" data-tab="vis">
+        <div class="visual-desc">
+          <div class="visual-item"><strong>图1 (0:05-0:12)</strong> 深圳湾上空候鸟群飞剪影，逆光金色天空 —— 震撼钩子画面</div>
+          <div class="visual-item"><strong>图2 (0:12-0:20)</strong> 红树林全景晨曦，金色阳光洒在海面，温暖治愈</div>
+          <div class="visual-item"><strong>图3 (0:20-0:25)</strong> 红树林滩涂近景，朝阳下安静的湿地</div>
+        </div>
+      </div>
+      <div class="voice-tip">前两句悬念感，稍慢、稍低沉；从 "My name is" 开始转为亲切温暖</div>
+    </div>
+  </div>
+
+  <!-- 第2幕 -->
+  <div class="scene" id="scene2">
+    <div class="scene-dot"></div>
+    <div class="scene-card">
+      <div class="scene-header">
+        <span class="scene-num">第2幕</span>
+        <span class="scene-title">候鸟登场</span>
+        <span class="word-count">45词</span>
+        <span class="scene-time">0:25 - 0:55</span>
+      </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this, 'en')">English Script</button>
+        <button class="tab-btn" onclick="switchTab(this, 'cn')">中文对照</button>
+        <button class="tab-btn" onclick="switchTab(this, 'vis')">画面描述</button>
+      </div>
+      <div class="tab-content active" data-tab="en">
+        <div class="en-script">
+          Every winter, very special guests arrive in Shenzhen. They are black-faced spoonbills — beautiful white birds with long, spoon-shaped beaks. They travel thousands of kilometres across the Asia-Pacific, just to spend the warm winter here, in our mangroves.
+        </div>
+      </div>
+      <div class="tab-content" data-tab="cn">
+        <div class="cn-script">
+          每年冬天，非常特别的客人会来到深圳。它们是黑脸琵鹭——美丽的白色鸟儿，长着长长的、勺子形状的喙。它们跨越亚太数千公里，只为来到我们的红树林，度过温暖的冬天。
+        </div>
+      </div>
+      <div class="tab-content" data-tab="vis">
+        <div class="visual-desc">
+          <div class="visual-item"><strong>图4 (0:25-0:35)</strong> 滩涂上的黑脸琵鹭群，白色鸟在浅水中觅食</div>
+          <div class="visual-item"><strong>图5 (0:35-0:45)</strong> 黑脸琵鹭特写，勺形嘴巴细节清晰</div>
+          <div class="visual-item"><strong>图6 (0:45-0:55)</strong> 几只琵鹭在红树林前展翅飞翔</div>
+        </div>
+      </div>
+      <div class="voice-tip">轻快、好奇，像分享自己的发现。"beautiful" 和 "spoon-shaped" 带开心语气</div>
+    </div>
+  </div>
+
+  <!-- 第3幕 -->
+  <div class="scene" id="scene3">
+    <div class="scene-dot"></div>
+    <div class="scene-card">
+      <div class="scene-header">
+        <span class="scene-num">第3幕</span>
+        <span class="scene-title">链接 APEC</span>
+        <span class="word-count">45词</span>
+        <span class="scene-time">0:55 - 1:20</span>
+      </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this, 'en')">English Script</button>
+        <button class="tab-btn" onclick="switchTab(this, 'cn')">中文对照</button>
+        <button class="tab-btn" onclick="switchTab(this, 'vis')">画面描述</button>
+      </div>
+      <div class="tab-content active" data-tab="en">
+        <div class="en-script">
+          These birds don't carry passports, but they are real travellers. Each year, they fly across many APEC economies — from Russia and South Korea, through Japan, all the way to Vietnam, the Philippines, and finally, to Shenzhen, China.<br><br>
+          One journey. Many homes.
+        </div>
+      </div>
+      <div class="tab-content" data-tab="cn">
+        <div class="cn-script">
+          这些鸟儿不带护照，但它们是真正的旅行家。每年，它们飞越许多APEC经济体——从俄罗斯和韩国，经过日本，一路到越南、菲律宾，最终来到中国深圳。<br><br>
+          一次旅程，多个家园。
+        </div>
+      </div>
+      <div class="tab-content" data-tab="vis">
+        <div class="visual-desc">
+          <div class="visual-item"><strong>图7 (0:55-1:05)</strong> 亚太地区地图，候鸟迁徙路线标注APEC经济体</div>
+          <div class="visual-item"><strong>图8 (1:05-1:15)</strong> 候鸟群在大海上空飞行的壮阔画面</div>
+          <div class="visual-item"><strong>图9 (1:15-1:20)</strong> 鸟群降落深圳湾，远处城市天际线</div>
+        </div>
+      </div>
+      <div class="voice-tip">平稳清晰，列举国家时节奏分明。"One journey. Many homes." 停顿加重</div>
+    </div>
+  </div>
+
+  <!-- 第4幕 -->
+  <div class="scene" id="scene4">
+    <div class="scene-dot"></div>
+    <div class="scene-card">
+      <div class="scene-header">
+        <span class="scene-num">第4幕</span>
+        <span class="scene-title">APEC 理念</span>
+        <span class="word-count">55词</span>
+        <span class="scene-time">1:20 - 1:50</span>
+      </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this, 'en')">English Script</button>
+        <button class="tab-btn" onclick="switchTab(this, 'cn')">中文对照</button>
+        <button class="tab-btn" onclick="switchTab(this, 'vis')">画面描述</button>
+      </div>
+      <div class="tab-content active" data-tab="en">
+        <div class="en-script">
+          But here's the thing — these birds can't make it alone. If even one country along the way doesn't protect its wetlands, the journey breaks.<br><br>
+          That's why they need everyone to work together. And you know what? That's exactly what APEC is about. We're like one big family across the Pacific — helping each other, sharing with each other, and growing together.
+        </div>
+      </div>
+      <div class="tab-content" data-tab="cn">
+        <div class="cn-script">
+          但关键是——这些鸟儿没法独自完成旅程。如果沿途哪怕一个国家不保护湿地，这趟旅程就断了。<br><br>
+          所以它们需要所有人一起合作。你知道吗？这恰恰就是APEC的意义。我们就像太平洋两岸的一个大家庭——互相帮助，彼此分享，共同成长。
+        </div>
+      </div>
+      <div class="tab-content" data-tab="vis">
+        <div class="visual-desc">
+          <div class="visual-item"><strong>图10 (1:20-1:30)</strong> 红树林日落，金色橙色天空，候鸟群飞剪影</div>
+          <div class="visual-item"><strong>图11 (1:30-1:40)</strong> 不同国家、肤色的小朋友微笑的拼贴画面</div>
+          <div class="visual-item"><strong>图12 (1:40-1:50)</strong> 深圳湾全景——红树林与城市天际线同框，夕阳余晖</div>
+        </div>
+      </div>
+      <div class="voice-tip">自然随意像聊天。"But here's the thing" 口语语气。"And you know what?" 停顿。"one big family" 加重</div>
+    </div>
+  </div>
+
+  <!-- 第5幕 -->
+  <div class="scene" id="scene5">
+    <div class="scene-dot"></div>
+    <div class="scene-card">
+      <div class="scene-header">
+        <span class="scene-num">第5幕</span>
+        <span class="scene-title">少年承诺</span>
+        <span class="word-count">40词</span>
+        <span class="scene-time">1:50 - 2:10</span>
+      </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this, 'en')">English Script</button>
+        <button class="tab-btn" onclick="switchTab(this, 'cn')">中文对照</button>
+        <button class="tab-btn" onclick="switchTab(this, 'vis')">画面描述</button>
+      </div>
+      <div class="tab-content active" data-tab="en">
+        <div class="en-script">
+          I grew up beside this mangrove. The promise of the birds is my promise too. I want to be a young friendship messenger from Shenzhen — working with kids across the Asia-Pacific to protect our shared home, and keep these beautiful birds flying free.<br><br>
+          Thank you.
+        </div>
+      </div>
+      <div class="tab-content" data-tab="cn">
+        <div class="cn-script">
+          我在这片红树林边长大。鸟儿的约定，也是我的约定。我想做一名来自深圳的少年友谊使者——和亚太的小伙伴们一起，守护我们共同的家园，让这些美丽的鸟儿自由飞翔。<br><br>
+          谢谢。
+        </div>
+      </div>
+      <div class="tab-content" data-tab="vis">
+        <div class="visual-desc">
+          <div class="visual-item"><strong>图13 (1:50-2:00)</strong> 清晨红树林，一只黑脸琵鹭展翅特写，充满希望感</div>
+          <div class="visual-item"><strong>图14 (2:00-2:10)</strong> 深圳湾日出全景，候鸟飞向光明的远方</div>
+        </div>
+      </div>
+      <div class="voice-tip">阳光、坚定，充满少年朝气。"Thank you." 真诚有力，带着微笑</div>
+    </div>
+  </div>
+
+  <!-- 片尾 -->
+  <div class="scene">
+    <div class="scene-dot"></div>
+    <div class="scene-card title-card">
+      <div class="scene-header">
+        <span class="scene-num">片尾</span>
+        <span class="scene-title">END CARD</span>
+        <span class="scene-time">2:10 - 2:20</span>
+      </div>
+      <div class="card-text">
+        渐变浅色背景 → <strong style="color:#f6d365">"The Mangrove Promise"</strong><br>
+        学生姓名 · Shenzhen, China · 2026 · 纯音乐渐弱
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 优化对比 -->
+<div class="compare-section">
+  <div class="compare-title">vs 原脚本优化对比</div>
+  <table class="compare-table">
+    <thead>
+      <tr><th>项目</th><th>原脚本</th><th>优化版</th><th>理由</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>总词数</td>
+        <td class="old-text">~280词</td>
+        <td class="new-text">~230词</td>
+        <td>留出画面呼吸空间</td>
+      </tr>
+      <tr>
+        <td>开头</td>
+        <td class="old-text">"Hi, my name is..."</td>
+        <td class="new-text">"Every year, thousands of birds..."</td>
+        <td>前5秒用悬念抓住注意力</td>
+      </tr>
+      <tr>
+        <td>第4幕语气</td>
+        <td class="old-text">"This is the heart of APEC too"</td>
+        <td class="new-text">"And you know what?"</td>
+        <td>让孩子说孩子的话</td>
+      </tr>
+      <tr>
+        <td>第4幕逻辑</td>
+        <td class="old-text">直接陈述理念</td>
+        <td class="new-text">先讲具体画面再引出理念</td>
+        <td>用画面感带动理解</td>
+      </tr>
+      <tr>
+        <td>片头片尾</td>
+        <td class="old-text">无</td>
+        <td class="new-text">片头5秒 + 片尾10秒</td>
+        <td>完整的开合感</td>
+      </tr>
+      <tr>
+        <td>结尾</td>
+        <td class="old-text">"Thank you!"</td>
+        <td class="new-text">"Thank you."</td>
+        <td>更沉稳自信</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+function switchTab(btn, tabName) {
+  const card = btn.closest('.scene-card');
+  card.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  card.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  card.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+}
+</script>
+</body>
+</html>
